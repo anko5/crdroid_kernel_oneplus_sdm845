@@ -61,8 +61,6 @@
 #ifdef CONFIG_SPARSEMEM_VMEMMAP
 #error "Vmemmap: No space for nodes field in page flags"
 #endif
-#define NODES_WIDTH		0
-#endif
 
 #ifdef CONFIG_NUMA_BALANCING
 #define LAST__PID_SHIFT 8
@@ -77,7 +75,7 @@
 #endif
 
 #if ZONES_WIDTH + LRU_GEN_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
-	KASAN_TAG_WIDTH + LAST_CPUPID_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
+	LAST_CPUPID_SHIFT <= BITS_PER_LONG - NR_PAGEFLAGS
 #define LAST_CPUPID_WIDTH LAST_CPUPID_SHIFT
 #else
 #define LAST_CPUPID_WIDTH 0
@@ -89,6 +87,17 @@
 	> BITS_PER_LONG - NR_PAGEFLAGS
 #error "KASAN: not enough bits in page flags for tag"
 #endif
+#else
+#define KASAN_TAG_WIDTH 0
+#endif
+
+#ifdef CONFIG_KASAN_SW_TAGS
+#define KASAN_TAG_WIDTH 8
+#if ZONES_WIDTH + SECTIONS_WIDTH + NODES_WIDTH + \
+	KASAN_TAG_WIDTH + LAST_CPUPID_WIDTH > BITS_PER_LONG - NR_PAGEFLAGS
+#error "Not enough bits in page flags"
+#endif
+
 #else
 #define KASAN_TAG_WIDTH 0
 #endif
