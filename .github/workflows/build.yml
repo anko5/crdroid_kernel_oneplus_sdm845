@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build Kernel (4.9 - crDroid)
 on:
   workflow_dispatch:
   schedule:
