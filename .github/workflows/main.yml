@@ -40,7 +40,7 @@ jobs:
           rm -rf KernelSU
           rm -rf drivers/kernelsu
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
-          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s Y
+          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s Y anrwt
           aria2c -j$(nproc --all) $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
           tar -xzvf Clang-*.tar.gz -C zyc-clang >> /dev/null
@@ -49,9 +49,6 @@ jobs:
           sed -i 's!BLOCK=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!BLOCK=auto;!g' AnyKernel3/anykernel.sh
           sed -i 's/IS_SLOT_DEVICE=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
           rm -rf AnyKernel3/.git* AnyKernel3/README.md
-          #mem module
-          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M anrwt
-        
 
       - name: GetTime
         id: get_time
@@ -68,10 +65,3 @@ jobs:
         with:
           name: Nyan_kernel-KSU-${{ steps.get_time.outputs.TIME }}
           path: "AnyKernel3/*"
-
-      - name: Upload mem module
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: memodule
-          path: "./out/drivers/memkernel/anrwt_memk.ko"
