@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build Kernel (4.9 - crDroid)
 on:
   workflow_dispatch:
   schedule:
@@ -19,7 +19,7 @@ jobs:
       CCACHE_NOHASHDIR: "true"
       CCACHE_MAXSIZE: "2G"
       CCACHE_HARDLINK: "true"
-      KERNEL_DEFCONFIG: "vendor/enchilada_defconfig vendor/debugfs.config"
+      KERNEL_DEFCONFIG: "enchilada_defconfig"
       KERNEL_CMDLINE: "ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- O=out"
     steps:
       - name: Checkout
@@ -37,7 +37,10 @@ jobs:
           sudo apt install gcc-aarch64-linux-gnu -y
           sudo apt install gcc-arm-linux-gnueabi -y
           sudo apt install aria2 binutils make python3 libssl-dev build-essential bc  bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs -y
+          rm -rf KernelSU
+          rm -rf drivers/kernelsu
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s Y
           aria2c -j$(nproc --all) $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
           tar -xzvf Clang-*.tar.gz -C zyc-clang >> /dev/null
@@ -46,8 +49,7 @@ jobs:
           sed -i 's!BLOCK=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!BLOCK=auto;!g' AnyKernel3/anykernel.sh
           sed -i 's/IS_SLOT_DEVICE=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
           rm -rf AnyKernel3/.git* AnyKernel3/README.md
-          #mem module
-          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M yuki
+
       - name: GetTime
         id: get_time
         run: |
@@ -57,15 +59,9 @@ jobs:
           export PATH=$(pwd)/zyc-clang/bin/:$PATH
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
-          cp out/arch/arm64/boot/Image-dtb AnyKernel3
+          cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3
       - name: Upload Kernel-SU
         uses: actions/upload-artifact@v4
         with:
           name: Nyan_kernel-KSU-${{ steps.get_time.outputs.TIME }}
           path: "AnyKernel3/*"
-      
-      - name: Upload mem module
-        uses: actions/upload-artifact@v4
-        with:
-          name: memodule
-          path: "./out/drivers/memkernel/yuki_memk.ko"
