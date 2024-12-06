@@ -46,7 +46,8 @@ jobs:
           sed -i 's!BLOCK=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!BLOCK=auto;!g' AnyKernel3/anykernel.sh
           sed -i 's/IS_SLOT_DEVICE=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
           rm -rf AnyKernel3/.git* AnyKernel3/README.md
-
+          #mem module
+          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s M yuki
       - name: GetTime
         id: get_time
         run: |
@@ -62,3 +63,9 @@ jobs:
         with:
           name: Nyan_kernel-KSU-${{ steps.get_time.outputs.TIME }}
           path: "AnyKernel3/*"
+      
+      - name: Upload mem module
+        uses: actions/upload-artifact@v4
+        with:
+          name: memodule
+          path: "./out/drivers/memkernel/yuki_memk.ko"
