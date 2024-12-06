@@ -40,7 +40,6 @@ jobs:
           rm -rf KernelSU
           rm -rf drivers/kernelsu
           curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
-          curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s Y
           aria2c -j$(nproc --all) $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
           tar -xzvf Clang-*.tar.gz -C zyc-clang >> /dev/null
